@@ -1,16 +1,5 @@
 import type { Metadata } from "next";
-import { Archivo, Space_Grotesk } from "next/font/google";
 import "./globals.css";
-
-const archivo = Archivo({
-	variable: "--font-sans",
-	subsets: ["latin"],
-});
-
-const spaceGrotesk = Space_Grotesk({
-	variable: "--font-display",
-	subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
 	title: "Gradient Generator",
@@ -27,7 +16,7 @@ export default function RootLayout({
 			<head>
 				<link rel="icon" href="/favicon.ico" type="image/svg+xml"></link>
 			</head>
-			<body className={`${archivo.variable} ${spaceGrotesk.variable} antialiased min-h-screen flex flex-col`}>
+			<body className="antialiased min-h-screen flex flex-col">
 				<main className="flex-1">
 					{children}
 				</main>

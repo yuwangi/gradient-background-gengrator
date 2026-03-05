@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import { generateRandomSVG } from '@/lib/services/gradientGenerator';
 import { colorToParam } from '@/lib/utils';
 
 export function useGradientGenerator() {
