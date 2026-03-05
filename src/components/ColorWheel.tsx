@@ -43,6 +43,11 @@ export function ColorWheel({
   
   // 使用 ref 存储拖拽开始时的颜色
   const dragStartColor = useRef<string>('');
+  
+  // 使用 ref 存储亮度调整的防抖定时器
+  const lightnessDebounceRef = useRef<NodeJS.Timeout | null>(null);
+  // 使用 ref 存储亮度调整结束后的最终值
+  const pendingLightnessRef = useRef<number>(50);
 
   // 根据亮度调整颜色
   const adjustLightness = useCallback((color: string, lightness: number): string => {
@@ -201,12 +206,33 @@ export function ColorWheel({
     }
   }, [primaryColor, secondaryColor, dragging]);
 
-  // 当亮度变化时，更新父组件的颜色
+  // 清理防抖定时器
+  useEffect(() => {
+    return () => {
+      if (lightnessDebounceRef.current) {
+        clearTimeout(lightnessDebounceRef.current);
+      }
+    };
+  }, []);
+
+  // 当亮度变化时，使用防抖更新父组件的颜色
   const handleLightnessChange = (newLightness: number) => {
+    // 立即更新本地状态以更新UI显示
     setLightness(newLightness);
-    // 立即应用亮度变化到父组件
-    onPrimaryChange(adjustLightness(tempPrimaryColor.current, newLightness));
-    onSecondaryChange(adjustLightness(tempSecondaryColor.current, newLightness));
+    pendingLightnessRef.current = newLightness;
+    
+    // 清除之前的定时器
+    if (lightnessDebounceRef.current) {
+      clearTimeout(lightnessDebounceRef.current);
+    }
+    
+    // 设置新的防抖定时器，150ms后应用最终亮度值
+    lightnessDebounceRef.current = setTimeout(() => {
+      const finalLightness = pendingLightnessRef.current;
+      onPrimaryChange(adjustLightness(tempPrimaryColor.current, finalLightness));
+      onSecondaryChange(adjustLightness(tempSecondaryColor.current, finalLightness));
+      lightnessDebounceRef.current = null;
+    }, 150);
   };
 
   // 计算亮度覆盖层的透明度
